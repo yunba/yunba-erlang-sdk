@@ -45,7 +45,7 @@ http_post_request(URL, Content, Timeout) ->
         {ok, ReturnCode, _Headers, Body} ->
             case ReturnCode of
                 "200" ->
-                    io:format("http post client ~p succeed ~p", [URL, Body]),
+                    %io:format("http post client ~p succeed ~p", [URL, Body]),
                     {ok, Body};
                 _Other ->
                     io:format("http post client ~p not return 200 ~p ~p~n", [URL, Content, _Other]),
