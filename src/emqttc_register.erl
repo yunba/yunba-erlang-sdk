@@ -25,12 +25,12 @@ register(RegURL, AppKey, Platform) ->
                 ClientId = proplists:get_value(<<"c">>, RegInfo),
                 UserName = proplists:get_value(<<"u">>, RegInfo),
                 Password = proplists:get_value(<<"p">>, RegInfo),
-                #yunba_reg_info{clientid = ClientId, username = UserName, password = Password}
+                {ok, {ClientId, UserName, Password}}
             catch
                 Type:Error->
                     io:format("Register MQTT client failed ~p:~p~n", [Type, Error]),
-                    fail
+                    {error, register_failed}
             end;
-        Other ->
-            Other
+        _Else ->
+            {error, register_failed}
     end.

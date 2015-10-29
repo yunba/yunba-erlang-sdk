@@ -12,7 +12,6 @@ start() ->
     ok = application:start(ibrowse),  %% start ibrowse to support http get/post
     ok = application:start(snowflake),
 
-
     {ClientOnline, _OnlineSession} = create_client(),
     {ClientOffline, OfflineSeesion} = create_client(),
 
@@ -41,7 +40,7 @@ start() ->
 
 create_client() ->
     %% register your appkey, get clientid, username and password
-    #yunba_reg_info{clientid = ClientId, username = UserName, password = Password} =
+    {ok, {ClientId, UserName, Password}} =
         emqttc_register:register(?YUNBA_REG_URL, ?TEST_APPKEY, ?TEST_PLATFORM),
 
     %% get MQTT broker IP (host and port) from yunba tick service

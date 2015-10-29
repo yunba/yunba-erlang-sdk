@@ -16,4 +16,5 @@ doc/edoc-info
 doc/erlang.png
 .idea/
 emqttc.iml
+yunba-erlang-sdk.iml
 test/logs

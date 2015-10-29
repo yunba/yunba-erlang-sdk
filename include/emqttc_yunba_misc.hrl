@@ -25,6 +25,3 @@
 
 -define(TEST_TIMEOUT, 12000).
 -define(RANDOM_NUMBER_RANGE, 4294967296).
-
-%% record about Yunba system
--record(yunba_reg_info, {clientid, username, password}).

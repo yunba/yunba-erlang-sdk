@@ -13,7 +13,7 @@ start() ->
     ok = application:start(snowflake),
 
     %% register your appkey, get clientid, username and password
-    #yunba_reg_info{clientid = ClientId, username = UserName, password = Password} =
+    {ok, {ClientId, UserName, Password}} =
         emqttc_register:register(?YUNBA_REG_URL, ?TEST_APPKEY, ?TEST_PLATFORM),
 
     %% get MQTT broker IP (host and port) from yunba tick service
