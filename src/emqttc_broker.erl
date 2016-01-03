@@ -45,7 +45,7 @@ get_broker(TickURL, AppKey) ->
             catch
                 Type:Error->
                     io:format("Register Yunba Broker failed ~p:~p~n", [Type, Error]),
-                    {error, Error};
+                    {error, Error}
             end;
         Other ->
             Other
