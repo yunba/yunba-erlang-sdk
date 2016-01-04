@@ -10,6 +10,7 @@
 
 %% The Yunba Network domain name
 -define(YUNBA_REG_URL, "http://reg.yunba.io:8383/device/reg/").
+-define(YUNBA_RESTFUL_URL, "http://rest.yunba.io:8080").
 -define(YUNBA_TICK_URL, "http://tick.yunba.io:9999").
 
 %% Test Data
