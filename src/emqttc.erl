@@ -863,16 +863,17 @@ received(?PUBLISH_PACKET(?QOS_0, Topic, undefined, Payload), State) ->
 
 received(Packet = ?PUBLISH_PACKET(?QOS_1, Topic, _PacketId, Payload), State = #state{parent = Parent, proto_state = ProtoState}) ->
     emqttc_protocol:received({'PUBLISH', Packet}, ProtoState),
-    %dispatch({publish, Topic, Payload}, State),
     Parent ! {publish, Topic, Payload},
     {ok, State};
 
-received(Packet = ?PUBLISH_PACKET(?QOS_2, _Topic, _PacketId, _Payload), State = #state{proto_state = ProtoState}) ->
+received(Packet = ?PUBLISH_PACKET(?QOS_2, Topic, _PacketId, Payload), State = #state{parent = Parent, proto_state = ProtoState}) ->
     {ok, ProtoState1} = emqttc_protocol:received({'PUBLISH', Packet}, ProtoState),
+    Parent ! {publish, Topic, Payload},
     {ok, State#state{proto_state = ProtoState1}};
 
-received(?PUBACK_PACKET(?PUBACK, PacketId), State = #state{proto_state = ProtoState}) ->
+received(?PUBACK_PACKET(?PUBACK, PacketId), State = #state{parent = Parent, proto_state = ProtoState}) ->
     {ok, ProtoState1} = emqttc_protocol:received({'PUBACK', PacketId}, ProtoState),
+    Parent ! {puback, PacketId},
     {ok, State#state{proto_state = ProtoState1}};
 
 received(?PUBACK_PACKET(?PUBREC, PacketId), State = #state{proto_state = ProtoState}) ->
@@ -889,8 +890,9 @@ received(?PUBACK_PACKET(?PUBREL, PacketId), State = #state{proto_state = ProtoSt
     emqttc_protocol:pubcomp(PacketId, ProtoState2),
     {ok, State#state{proto_state = ProtoState2}};
 
-received(?PUBACK_PACKET(?PUBCOMP, PacketId), State = #state{proto_state = ProtoState}) ->
+received(?PUBACK_PACKET(?PUBCOMP, PacketId), State = #state{parent = Parent, proto_state = ProtoState}) ->
     {ok, ProtoState1} = emqttc_protocol:received({'PUBCOMP', PacketId}, ProtoState),
+    Parent ! {pubcomp, PacketId},
     {ok, State#state{proto_state = ProtoState1}};
 
 received(?SUBACK_PACKET(PacketId, QosTable), State = #state{parent = Parent, proto_state = ProtoState}) ->
