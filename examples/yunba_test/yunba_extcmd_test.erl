@@ -17,7 +17,7 @@ start() ->
         emqttc_register:register(?YUNBA_REG_URL, ?TEST_APPKEY, ?TEST_PLATFORM),
 
     %% get MQTT broker IP (host and port) from yunba tick service
-    {Host, Port} = emqttc_broker:get_broker(?YUNBA_TICK_URL),
+    {ok, {Host, Port}}  = emqttc_broker:get_broker(?YUNBA_TICK_URL),
 
     %% connect MQTT broker
     {ok, Client} = emqttc:start_link([{host, Host}, {port, Port}, {client_id, ClientId},

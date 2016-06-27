@@ -22,14 +22,14 @@ get_broker(TickURL) ->
                 {BrokerInfo} = jiffy:decode(BodyBin),
                 BrokerBin = proplists:get_value(<<"c">>, BrokerInfo),
                 Broker = parse_broker_ip(binary_to_list(BrokerBin)),
-                Broker
+                {ok, Broker}
             catch
                 Type:Error->
                     io:format("Register Yunba Broker failed ~p:~p~n", [Type, Error]),
-                    fail
+                    {error, Error}
             end;
-        Other ->
-            Other
+        {error, Reason} ->
+            {error, Reason}
     end.
 
 get_broker(TickURL, AppKey) ->
@@ -41,11 +41,11 @@ get_broker(TickURL, AppKey) ->
                 {BrokerInfo} = jiffy:decode(BodyBin),
                 BrokerBin = proplists:get_value(<<"c">>, BrokerInfo),
                 Broker = parse_broker_ip(binary_to_list(BrokerBin)),
-                Broker
+                {ok, Broker}
             catch
                 Type:Error->
                     io:format("Register Yunba Broker failed ~p:~p~n", [Type, Error]),
-                    fail
+                    {error, Error}
             end;
         Other ->
             Other
