@@ -130,7 +130,7 @@ parse_broker_ip(Broker) when is_list(Broker) ->
 parse_tcp_response(Data) ->
     try
         <<Version:8, Length:16, Rest1/binary>> = Data,
-        case (Version =:= ?YUNBA_TICKET_TCP_DEFAULT_VERSION) andalso (size(Rest1) >= Length) of
+        case (Version =:= ?YUNBA_DIRECT_TCP_CONNECT_DEFAULT_VERSION) andalso (size(Rest1) >= Length) of
             true ->
                 <<JsonData:Length/binary, _/binary>> = Rest1,
                 {JsonData1} = jiffy:decode(JsonData),
@@ -167,4 +167,4 @@ form_tcp_data(Request) ->
         {<<"t">>, emqttc_utils:to_bin(Type)}
     ]}),
     Length = size(JsonData),
-    <<?YUNBA_TICKET_TCP_DEFAULT_VERSION:8, Length:16, JsonData/binary>>.
+    <<?YUNBA_DIRECT_TCP_CONNECT_DEFAULT_VERSION:8, Length:16, JsonData/binary>>.

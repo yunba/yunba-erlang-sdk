@@ -17,7 +17,12 @@
 -define(YUNBA_TICKET_TCP_PORT, 9977).
 -define(YUNBA_TICKET_HTTP_HOST, "tick.yunba.io").
 -define(YUNBA_TICKET_HTTP_PORT, 9999).
--define(YUNBA_TICKET_TCP_DEFAULT_VERSION, 1).
+-define(YUNBA_DIRECT_TCP_CONNECT_DEFAULT_VERSION, 1).
+
+-define(YUNBA_REG_TCP_HOST, "reg-t.yunba.io").
+-define(YUNBA_REG_TCP_PORT, 9944).
+-define(YUNBA_REG_HTTP_HOST, "reg.yunba.io").
+-define(YUNBA_REG_HTTP_PORT, 8383).
 
 -record(request_ticket_args, {
     appkey,
@@ -26,6 +31,11 @@
     networkoperator,
     clientid,
     type
+}).
+
+-record(request_reg_args, {
+    appkey,
+    platform
 }).
 
 %% Test Data
