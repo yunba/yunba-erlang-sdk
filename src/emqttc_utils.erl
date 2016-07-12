@@ -11,7 +11,8 @@
 
 %% The following API is mostly from elogic project
 
--export([http_post/2, http_post/3, make_sure_binary/1, http_get/1, http_get/2]).
+-export([http_post/2, http_post/3, http_get/1, http_get/2,
+         to_bin/1, to_str/1, to_int/1, to_atom/1]).
 
 -define(HTTP_TIMEOUT, 30000).
 
@@ -39,7 +40,7 @@ http_post(URL, Content, Timeout) ->
             Else
     end.
 
-make_sure_binary(Data) ->
+to_bin(Data) ->
     if
         is_list(Data) ->
             list_to_binary(Data);
@@ -51,13 +52,50 @@ make_sure_binary(Data) ->
             Data
     end.
 
-%% Internal API
+to_str(Data) ->
+    if
+        is_binary(Data) ->
+            binary_to_list(Data);
+        is_integer(Data) ->
+            integer_to_list(Data);
+        is_atom(Data) ->
+            atom_to_list(Data);
+        true ->
+            Data
+    end.
+
+to_int(Data) ->
+    if
+        is_binary(Data) ->
+            binary_to_integer(Data);
+        is_list(Data) ->
+            list_to_integer(Data);
+        is_integer(Data) ->
+            Data;
+        true ->
+            Data
+    end.
+
+to_atom(Data) ->
+    if
+        is_binary(Data) ->
+            binary_to_atom(Data, utf8);
+        is_list(Data) ->
+            list_to_atom(Data);
+        is_atom(Data) ->
+            Data;
+        true ->
+            Data
+    end.
+
+%%%===================================================================
+%%% Internal functions
+%%%===================================================================
 http_post_request(URL, Content, Timeout) ->
     try ibrowse:send_req(URL,[{"Content-type", "application/json"}],post, Content, [], Timeout) of
         {ok, ReturnCode, _Headers, Body} ->
             case ReturnCode of
                 "200" ->
-                    %io:format("http post client ~p succeed ~p", [URL, Body]),
                     {ok, Body};
                 _Other ->
                     io:format("http post client ~p not return 200 ~p ~p~n", [URL, Content, _Other]),
@@ -65,12 +103,10 @@ http_post_request(URL, Content, Timeout) ->
             end;
         {error, connection_closing} ->
             {error, connection_closing};
-        {error, REASON} ->
-            io:format("http post client ~p failed ~p ~p~n", [URL, Content, REASON]),
+        {error, _REASON} ->
             {error, <<"http failed">>}
     catch
-        Type:Error ->
-            io:format("http post client ~p failed ~p ~p:~p~n", [URL, Content, Type, Error]),
+        _Type:_Error ->
             {error, <<"http failed">>}
     end.
 
@@ -79,19 +115,15 @@ http_get_request(URL, Timeout) ->
         {ok, ReturnCode, _Headers, Body} ->
             case ReturnCode of
                 "200" ->
-                    io:format("http get client ~p succeed ~p", [URL, Body]),
                     {ok, Body};
                 _Other ->
-                    io:format("http get client ~p not return 200 ~p~n", [URL, _Other]),
                     {error, Body}
             end;
         {error, connection_closing} ->
             {error, connection_closing};
-        {error, REASON} ->
-            io:format("http get client ~p failed ~p~n", [URL, REASON]),
+        {error, _REASON} ->
             {error, <<"http failed">>}
     catch
-        Type:Error ->
-            io:format("http get client ~p failed ~p:~p~n", [URL, Type, Error]),
+        _Type:_Error ->
             {error, <<"http failed">>}
     end.

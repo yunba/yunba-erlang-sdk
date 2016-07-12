@@ -19,7 +19,7 @@ register(RegURL, AppKey, Platform) ->
     PostContent = jiffy:encode({[{<<"a">>, AppKey}, {<<"p">>, Platform}]}),
     case emqttc_utils:http_post(RegURL, PostContent) of
         {ok, Body} ->
-            BodyBin = emqttc_utils:make_sure_binary(Body),
+            BodyBin = emqttc_utils:to_bin(Body),
             try
                 {RegInfo} = jiffy:decode(BodyBin),
                 ClientId = proplists:get_value(<<"c">>, RegInfo),

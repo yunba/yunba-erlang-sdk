@@ -16,7 +16,7 @@
 -export([set_alias/2, get_alias/1, publish_to_alias/3]).
 
 set_alias(Client, AliasName) ->
-    AliasNameBin = emqttc_utils:make_sure_binary(AliasName),
+    AliasNameBin = emqttc_utils:to_bin(AliasName),
     emqttc:publish(Client, ?PUBLISH_TOPIC_FOR_SET_ALIAS, AliasNameBin, qos1),
     timer:sleep(1000).
 
@@ -37,6 +37,6 @@ get_alias(Client) ->
     end.
 
 publish_to_alias(Client, AliasName, Payload) ->
-    AliasNameBin = emqttc_utils:make_sure_binary(AliasName),
+    AliasNameBin = emqttc_utils:to_bin(AliasName),
     AliasTopicBin = <<?PUBLISH_TOPIC_PREFIX_FOR_PUBLISH_TO_ALIAS/binary, AliasNameBin/binary>>,
     emqttc:publish(Client, AliasTopicBin, Payload, qos1).

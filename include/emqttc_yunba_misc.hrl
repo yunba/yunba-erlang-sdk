@@ -13,6 +13,21 @@
 -define(YUNBA_RESTFUL_URL, "http://rest.yunba.io:8080").
 -define(YUNBA_TICK_URL, "http://tick.yunba.io:9999").
 
+-define(YUNBA_TICKET_TCP_HOST, "tick-t.yunba.io").
+-define(YUNBA_TICKET_TCP_PORT, 9977).
+-define(YUNBA_TICKET_HTTP_HOST, "tick.yunba.io").
+-define(YUNBA_TICKET_HTTP_PORT, 9999).
+-define(YUNBA_TICKET_TCP_DEFAULT_VERSION, 1).
+
+-record(request_ticket_args, {
+    appkey,
+    networktype,
+    sdk_version,
+    networkoperator,
+    clientid,
+    type
+}).
+
 %% Test Data
 -define(TEST_CLIENTID, <<"0000000005-000000482068">>).
 -define(TEST_USERNAME, <<"2424032683041115008">>).
