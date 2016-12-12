@@ -36,20 +36,20 @@ request_ticket_by_http(RequestHost, RequestPort, Request) ->
         clientid = ClientId,
         type = Type
     } = Request,
-    PostContent = jiffy:encode({[
+    PostContent = jsx:encode([
         {<<"a">>, emqttc_utils:to_bin(Appkey)},
         {<<"n">>, emqttc_utils:to_bin(NetworkType)},
         {<<"o">>, emqttc_utils:to_bin(NetworkOperator)},
         {<<"v">>, emqttc_utils:to_bin(SDKVerison)},
         {<<"c">>, emqttc_utils:to_bin(ClientId)},
         {<<"t">>, emqttc_utils:to_bin(Type)}
-    ]}),
+    ]),
     TickURL = "http://" ++ emqttc_utils:to_str(RequestHost) ++  ":" ++ emqttc_utils:to_str(RequestPort),
     case emqttc_utils:http_post(TickURL, PostContent) of
         {ok, Body} ->
             BodyBin = emqttc_utils:to_bin(Body),
             try
-                {BrokerInfo} = jiffy:decode(BodyBin),
+                BrokerInfo = jsx:decode(BodyBin),
                 BrokerBin = proplists:get_value(<<"c">>, BrokerInfo),
                 Broker = parse_broker_ip(binary_to_list(BrokerBin)),
                 {ok, Broker}
@@ -86,7 +86,7 @@ get_broker(TickURL) ->
         {ok, Body} ->
             BodyBin = emqttc_utils:to_bin(Body),
             try
-                {BrokerInfo} = jiffy:decode(BodyBin),
+                BrokerInfo = jsx:decode(BodyBin),
                 BrokerBin = proplists:get_value(<<"c">>, BrokerInfo),
                 Broker = parse_broker_ip(binary_to_list(BrokerBin)),
                 {ok, Broker}
@@ -100,12 +100,12 @@ get_broker(TickURL) ->
     end.
 
 get_broker(TickURL, AppKey) ->
-    PostContent = jiffy:encode({[{<<"a">>, AppKey}]}),
+    PostContent = jsx:encode([{<<"a">>, AppKey}]),
     case emqttc_utils:http_post(TickURL, PostContent) of
         {ok, Body} ->
             BodyBin = emqttc_utils:to_bin(Body),
             try
-                {BrokerInfo} = jiffy:decode(BodyBin),
+                BrokerInfo = jsx:decode(BodyBin),
                 BrokerBin = proplists:get_value(<<"c">>, BrokerInfo),
                 Broker = parse_broker_ip(binary_to_list(BrokerBin)),
                 {ok, Broker}
@@ -133,7 +133,7 @@ parse_tcp_response(Data) ->
         case (Version =:= ?YUNBA_DIRECT_TCP_CONNECT_DEFAULT_VERSION) andalso (size(Rest1) >= Length) of
             true ->
                 <<JsonData:Length/binary, _/binary>> = Rest1,
-                {JsonData1} = jiffy:decode(JsonData),
+                JsonData1 = jsx:decode(JsonData),
                 Broker = proplists:get_value(<<"c">>, JsonData1),
                 case Broker of
                     undefined ->
@@ -158,13 +158,13 @@ form_tcp_data(Request) ->
         clientid = ClientId,
         type = Type
     } = Request,
-    JsonData = jiffy:encode({[
+    JsonData = jsx:encode([
         {<<"a">>, emqttc_utils:to_bin(Appkey)},
         {<<"n">>, emqttc_utils:to_bin(NetworkType)},
         {<<"o">>, emqttc_utils:to_bin(NetworkOperator)},
         {<<"v">>, emqttc_utils:to_bin(SDKVerison)},
         {<<"c">>, emqttc_utils:to_bin(ClientId)},
         {<<"t">>, emqttc_utils:to_bin(Type)}
-    ]}),
+    ]),
     Length = size(JsonData),
     <<?YUNBA_DIRECT_TCP_CONNECT_DEFAULT_VERSION:8, Length:16, JsonData/binary>>.

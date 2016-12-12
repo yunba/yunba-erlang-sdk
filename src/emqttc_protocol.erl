@@ -125,7 +125,7 @@ init_willmsg([_Opt | Opts], State) ->
     init_willmsg(Opts, State).
 
 random_id() ->
-    random:seed(now()),
+    random:seed(os:timestamp()),
     I1 = random:uniform(round(math:pow(2, 48))) - 1,
     I2 = random:uniform(round(math:pow(2, 32))) - 1,
     list_to_binary(["emqttc_" | io_lib:format("~12.16.0b~8.16.0b", [I1, I2])]).

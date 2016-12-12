@@ -1,17 +1,19 @@
 #! /usr/bin/env escript
-%%! -smp enable -mnesia debug verbose -Wall -pz ../../ebin/ ../../deps/gen_logger/ebin ../../deps/goldrush/ebin ../../deps/lager/ebin ../../deps/ibrowse/ebin ../../deps/jiffy/ebin ../../deps/snowflake/ebin
 
 -module(yunba_simple_test).
 
 -include("../../include/emqttc_packet.hrl").
 -include("../../include/emqttc_yunba_misc.hrl").
 
--export([start/0]).
+-export([main/1]).
+
+-define(DEPS_PATH, "../../deps/").
+
+main(_Args) ->
+    pre_start(),
+    start().
 
 start() ->
-    ok = application:start(ibrowse),  %% start ibrowse to support http get/post
-    ok = application:start(snowflake),
-
     %% register your appkey, get clientid, username and password
     {ok, {ClientId, UserName, Password}} =
         emqttc_register:register(?YUNBA_REG_URL, ?TEST_APPKEY, ?TEST_PLATFORM),
@@ -55,5 +57,12 @@ start() ->
     %% disconnect the broker after finishing the simple test
     emqttc:disconnect(Client).
 
-main(_Args) ->
-    start().
+pre_start() ->
+    CodePath = add_code_path(?DEPS_PATH),
+    [code:add_path(Path) || Path <- CodePath],
+    {ok, _} = application:ensure_all_started(ibrowse),  %% start ibrowse to support http get/post
+    {ok, _} = application:ensure_all_started(snowflake),
+    {ok, _} = application:ensure_all_started(jsx).
+
+add_code_path(DepsPath) ->
+    filelib:wildcard(DepsPath ++ "*/ebin/") ++ ["../../ebin/"].

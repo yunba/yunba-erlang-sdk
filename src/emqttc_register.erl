@@ -32,12 +32,12 @@ register(Type, RequestHost, RequestPort, Request) ->
 %%% Deprecated API
 %%%===================================================================
 register(RegURL, AppKey, Platform) ->
-    PostContent = jiffy:encode({[{<<"a">>, AppKey}, {<<"p">>, Platform}]}),
+    PostContent = jsx:encode([{<<"a">>, AppKey}, {<<"p">>, Platform}]),
     case emqttc_utils:http_post(RegURL, PostContent) of
         {ok, Body} ->
             BodyBin = emqttc_utils:to_bin(Body),
             try
-                {RegInfo} = jiffy:decode(BodyBin),
+                RegInfo = jsx:decode(BodyBin),
                 ClientId = proplists:get_value(<<"c">>, RegInfo),
                 UserName = proplists:get_value(<<"u">>, RegInfo),
                 Password = proplists:get_value(<<"p">>, RegInfo),
@@ -59,16 +59,16 @@ request_reg_by_http(RequestHost, RequestPort, Request) ->
         appkey = Appkey,
         platform = Platform
     } = Request,
-    PostContent = jiffy:encode({[
+    PostContent = jsx:encode([
         {<<"a">>, emqttc_utils:to_bin(Appkey)},
         {<<"p">>, emqttc_utils:to_bin(Platform)}
-    ]}),
+    ]),
     RegURL = "http://" ++ emqttc_utils:to_str(RequestHost) ++  ":" ++ emqttc_utils:to_str(RequestPort) ++ "/device/reg/",
     case emqttc_utils:http_post(RegURL, PostContent) of
         {ok, Body} ->
             BodyBin = emqttc_utils:to_bin(Body),
             try
-                {RegInfo} = jiffy:decode(BodyBin),
+                RegInfo = jsx:decode(BodyBin),
                 ClientId = proplists:get_value(<<"c">>, RegInfo),
                 UserName = proplists:get_value(<<"u">>, RegInfo),
                 Password = proplists:get_value(<<"p">>, RegInfo),
@@ -104,7 +104,7 @@ parse_tcp_response(Data) ->
         case (Version =:= ?YUNBA_DIRECT_TCP_CONNECT_DEFAULT_VERSION) andalso (size(Rest1) >= Length) of
             true ->
                 <<JsonData:Length/binary, _/binary>> = Rest1,
-                {JsonData1} = jiffy:decode(JsonData),
+                JsonData1 = jsx:decode(JsonData),
                 ClientId = proplists:get_value(<<"c">>, JsonData1),
                 UserName = proplists:get_value(<<"u">>, JsonData1),
                 Password = proplists:get_value(<<"p">>, JsonData1),
@@ -136,9 +136,9 @@ form_tcp_data(Request) ->
         appkey = Appkey,
         platform = Platform
     } = Request,
-    JsonData = jiffy:encode({[
+    JsonData = jsx:encode([
         {<<"a">>, emqttc_utils:to_bin(Appkey)},
         {<<"p">>, emqttc_utils:to_bin(Platform)}
-    ]}),
+    ]),
     Length = size(JsonData),
     <<?YUNBA_DIRECT_TCP_CONNECT_DEFAULT_VERSION:8, Length:16, JsonData/binary>>.
