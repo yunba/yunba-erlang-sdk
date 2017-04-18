@@ -919,33 +919,12 @@ received(?PACKET(?PINGRESP), State= #state{ping_reqs = PingReqs}) ->
 %% @doc Dispatch Publish Message to subscribers.
 %% @end
 %%------------------------------------------------------------------------------
-dispatch(Publish = {publish, TopicName, _Payload}, #state{name = Name,
+dispatch(Publish = {publish, _TopicName, _Payload}, #state{name = _Name,
                                                           parent = Parent,
-                                                          pubsub_map = PubSubMap,
-                                                          logger = Logger,
-                                                          alias = Alias}) ->
-    Matched =
-    lists:foldl(
-        fun(TopicFilter, Acc) -> 
-                case emqttc_topic:match(TopicName, TopicFilter) of 
-                    true ->
-                        {_Qos, Subs} = maps:get(TopicFilter, PubSubMap),
-                        [Sub ! Publish || Sub <- Subs], [TopicFilter | Acc];
-                    false ->
-                        Acc 
-                end
-        end, [], maps:keys(PubSubMap)),
-    if
-        length(Matched) =:= 0 ->
-            case {Alias =:= TopicName, ?PUBLISH_TOPIC_FOR_GET_ALIAS =:= TopicName} of
-                {false,false} ->
-                    Logger:warning("[Client ~s] Dropped: ~p", [Name, Publish]);
-                _Else ->
-                    Parent ! Publish
-            end;
-        true ->
-            ok
-    end.
+                                                          pubsub_map = _PubSubMap,
+                                                          logger = _Logger,
+                                                          alias = _Alias}) ->
+    Parent ! Publish.
 
 qos_opt(qos2) ->
     ?QOS_2;
